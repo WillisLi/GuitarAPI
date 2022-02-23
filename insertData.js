@@ -17,9 +17,14 @@ require('dotenv').config();
             const electricChicagoMusicExchange = await Scrapers.scrapeChicagoMusicExchange("electric");
             const bassChicagoMusicExchange = await Scrapers.scrapeChicagoMusicExchange("bass");
 
+            const acousticGuitarCenter = await Scrapers.scrapeGuitarCenter("acoustic");
+            const electricGuitarCenter = await Scrapers.scrapeGuitarCenter("electric");
+            const bassGuitarCenter = await Scrapers.scrapeGuitarCenter("bass");
+
             const data = [
                 ...acousticSweetwater, ...electricSweetwater, ...bassSweetwater, 
-                ...acousticChicagoMusicExchange, ...electricChicagoMusicExchange, ...bassChicagoMusicExchange
+                ...acousticChicagoMusicExchange, ...electricChicagoMusicExchange, ...bassChicagoMusicExchange,
+                ...acousticGuitarCenter, ...electricGuitarCenter, ...bassGuitarCenter
             ];
             
             for (let guitar of data) {

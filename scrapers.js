@@ -108,7 +108,52 @@ const scrapeChicagoMusicExchange = async (guitarType) => {
   return data
 };
 
+const scrapeGuitarCenter = async (guitarType) => {
+  const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+  puppeteer.use(StealthPlugin())
+
+  const browser = await puppeteer.launch({headless: false});
+
+  const acousticUrl = "https://www.guitarcenter.com/Left-Handed-Acoustic-Guitars.gc"
+  const electricUrl = "https://www.guitarcenter.com/Left-Handed-Electric-Guitars.gc"
+  const bassUrl = "https://www.guitarcenter.com/Left-Handed-Electric-Bass.gc"
+
+  const url = guitarType === 'acoustic' ? acousticUrl : guitarType === 'electric' ? electricUrl : bassUrl;
+
+  const scrapePage = async () => {
+    await page.waitForTimeout(3000).then(() => console.log('Waiting...'));
+    const data = await page.evaluate((guitarType) => {
+      return Array.from(document.querySelectorAll("div.productGrid li.product-container")).map(product => ({
+        website: "guitarcenter",
+        type: guitarType,
+        name: product.querySelector('div.productTitle a').innerText.trim(),
+        price: product.querySelector('div.mainPrice span.productPrice').innerText.replace(/\n/g, "").replace("Your Price", "").trim(),
+        link: product.querySelector('div.thumb > a').href,
+        image: product.querySelector('div.thumb a img').src
+      }))
+    }, guitarType)
+
+    const next = await page.evaluate(() => document.querySelector("a.-next") ? true : false)
+    if (next) {
+      await page.click('a.-next')
+      return data.concat(await scrapePage());
+    } else {
+      return data
+    }
+  }
+
+  const page = await browser.newPage();
+    await page.goto(url, {
+      waitUntil: 'domcontentloaded'
+  });
+
+  const data = await scrapePage()
+  await browser.close();
+  return data
+}
+
 module.exports = {
   scrapeSweetWater,
-  scrapeChicagoMusicExchange
+  scrapeChicagoMusicExchange,
+  scrapeGuitarCenter
 };
