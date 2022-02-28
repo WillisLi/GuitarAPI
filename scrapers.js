@@ -127,7 +127,7 @@ const scrapeGuitarCenter = async (guitarType) => {
         website: "guitarcenter",
         type: guitarType,
         name: product.querySelector('div.productTitle a').innerText.trim(),
-        price: product.querySelector('div.mainPrice span.productPrice').innerText.replace(/\n/g, "").replace("Your Price", "").trim(),
+        price: product.querySelector('div.mainPrice span.productPrice').innerText.replace(/\n/g, "").replace("Your Price", "").replace("From", "").trim(),
         link: product.querySelector('div.thumb > a').href,
         image: product.querySelector('div.thumb a img').src
       }))
